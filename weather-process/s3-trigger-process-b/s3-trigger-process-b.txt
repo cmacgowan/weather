@@ -1,0 +1,324 @@
+
+Bluerayon Development Labs
+The Weather Process System (Demonstration)
+s3 Trigger Process B - Lambda Serverless Component
+Technical Document 
+Copyright (c) 2005-2019 Bluerayon Development Labs
+Chris Macgowan 
+11 Sep 2019
+s3-trigger-process-b.txt
+
+Description: 
+
+This is the technical documentation for the s3-trigger-process-b. The s3-trigger-process-b is a AWS Lambda Component that is part of the The Weather Process System. The The Weather Process System is used for demonstration. 
+
+-----------------------------------------------------------------------------
+Software License
+
+MIT License
+
+Copyright (c) 2005-2019 Bluerayon Development Labs
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+MIT License
+https://opensource.org/licenses/MIT
+
+
+-----------------------------------------------------------------------------
+Introduction
+
+The s3-trigger-process-b AWS Lambda component will be used to set the Humidity baces on some SateCode and or StateId passedin to the event. 
+
+
+**** 
+
+macOS - High Sierra - 10.13.6
+
+Install Notes (for testing)
+
+sudo pip install tornado
+
+sudo pip install nose 
+
+sudo pip install -U pytest
+
+sudo pip install six
+
+// sudo pip install virtualenvwrapper --upgrade --ignore-installed six
+
+sudo pip install -U pytest --ignore-installed six
+
+pip install pytest pytest-mock --user
+
+
+-----------------------------------------------------------------------------
+Resources
+
+Tutorial: Deploying a Hello World Application
+https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started-hello-world.html
+
+Unit Test & TDD Lambda Functions
+http://joshuaballoch.github.io/testing-lambda-functions/
+
+
+-----------------------------------------------------------------------------
+Identity and Access Management (IAM)
+
+No Comments
+
+
+-----------------------------------------------------------------------------
+Construction
+
+A couple notes on the construction of this AWS Lambda. This s3-trigger-process-a built from the ground p using the sam-app hello world app as a template. 
+
+Below are a couple notes on the construction. 
+
+- The AWS SAM CLI is installed and operational
+
+- Change to a working folder 
+- /Users/macgowan/aws/projects/weather-process
+
+- Execute $ sam init --runtime python3.7
+- The template hello world app is created
+
+- Change root folder from sam-app to s3-trigger-process-a 
+- Change the app folder from hello_world to app
+- Update template.yaml, update the CodeUri: from hello-world/ to app/
+- Update the app.py
+- build was successful
+
+Notes: 
+
+- Follow the Package and Deploy proceedures below to deploy the Lambda component. 
+
+- When running from the Dashboard after the deploy we might of had to update the name of the function in the Dashboard. All was ok on the next deploy
+
+
+-----------------------------------------------------------------------------
+The System
+
+The Weather Process System was created to learn some stuff about AWS Lambda and provide a platfor for demonstation of testing principles.
+
+The Weather Process System consisita of the following components. 
+
+- s3 Bucket (build on the AWS Dashboad)
+- s3-trigger (The controller)
+- s3-trigger-process-a (process the temperature)
+- s3-trigger-process-b (process the humidity)
+- s3-trigger-storage (write data to the dynomoDB) 
+
+
+-----------------------------------------------------------------------------
+General Notes 
+
+None
+
+
+
+-----------------------------------------------------------------------------
+Buid Notes 
+
+We are using SAM BUILD command to build. 
+We think this was working 
+Not any more :-) 
+
+Build Failed
+Error: PythonPipBuilder:ResolveDependencies - {wrapt==1.11.2(sdist), pycparser==2.19(sdist), future==0.17.1(sdist), jsondiff==1.1.1(sdist), pyyaml==5.1.2(sdist)} 
+
+None
+
+// wrapt==1.11.2
+// Installed successfully
+sudo pip install wrapt
+
+// pycparser==2.19
+// Installed successfully
+sudo pip install pycparser
+
+// future==0.17.1
+// Installed successfully
+sudo pip install future
+
+// jsondiff==1.1.1 
+// Installed successfully
+sudo pip install jsondiff
+
+// pyyaml==5.1.2
+// Installed successfully
+sudo pip install pyyaml
+
+* Still failing ??? 
+
+// This worked 
+sam build --use-container
+
+
+-----------------------------------------------------------------------------
+Execution
+
+The following commands can be used to build, package, deploy and run the app. 
+
+* The Commands below have been updated to support s3-trigger
+* --stack-name aws-sam-s3-trigger
+
+// Build the application
+// We used to be able to build without the container spec - but we are having 
+// some issues with dependensired - you will see 
+sam build --use-container
+
+// Package the application for deployment
+sam package --output-template packaged.yaml --s3-bucket aws-sam-bucket-macgowan
+
+// Deploy the application to the AWS cloud
+sam deploy --template-file packaged.yaml --region us-east-1 --capabilities CAPABILITY_IAM --stack-name s3-trigger-process-b
+
+* Can't really test it as it dies not expose an API - we should add one :
+
+// Test the application in the AWS Cloud
+aws cloudformation describe-stacks --stack-name s3-trigger-process-b --region us-east-1 --query "Stacks[].Outputs"
+
+// Testing Your Application Locally (Optional)
+sam local start-api 
+
+
+-----------------------------------------------------------------------------
+Local Testing - General  
+
+Below are some notes on local testing (unit testing) using pytest. We had some issues getting this work as there is not good doc on the tutorial. Found some info in the Articles Blow. 
+
+*******
+Install 
+
+We also needed to install this stuff (Global)
+
+macOS - High Sierra - 10.13.6
+
+Install Notes (for testing)
+
+sudo pip install tornado
+
+sudo pip install nose 
+
+sudo pip install -U pytest
+
+sudo pip install six
+
+// sudo pip install virtualenvwrapper --upgrade --ignore-installed six
+
+sudo pip install -U pytest --ignore-installed six
+
+pip install pytest pytest-mock --user
+
+*******
+AND 
+
+We need to fix this !!! 
+
+ERROR collecting tests/unit/test_handler.py __________________________________________
+ImportError while importing test module '/Users/macgowan/aws/projects/weather-process/s3-trigger/tests/unit/test_handler.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+tests/unit/test_handler.py:5: in <module>
+    from hello_world import app
+E   ImportError: No module named hello_world
+
+// We needed to update the hello-world to app 
+// As this is what we changed the name to
+E   ImportError: No module named hello_world
+
+// We used pip to install this ... 
+E   ImportError: No module named boto3
+pip install --upgrade --user boto3
+
+*******
+Test
+
+Once again - take a look at readme.md :-)  
+
+Current Folder
+/Users/macgowan/aws/projects/weather-process/s3-trigger
+
+Next, we install test dependencies and we run `pytest` against our `tests` folder to run our initial unit tests:
+
+pip install pytest pytest-mock --user
+python -m pytest tests/ -v
+
+*******
+Mock Event
+
+The test above is failing as the event is getting trigger (I think) but then there is the data that is not being mocked in the event - do you know tha I have been talking about. 
+
+Unit Test & TDD Lambda Functions
+http://joshuaballoch.github.io/testing-lambda-functions/
+
+We are using this example above :-) 
+
+
+-----------------------------------------------------------------------------
+Local Testing - Mock S3 Trigger 
+
+We are looking at attempting to mock the s3 trigger that we are using to get the file that we ware drippig into the s3 bucket. We are using some external resources for reaidng about this. 
+
+Resources: 
+
+Event Message Structure (AWS S3)
+https://docs.aws.amazon.com/AmazonS3/latest/dev/notification-content-structure.html
+
+Miscellaneous Examples JSON Schema
+http://json-schema.org/learn/miscellaneous-examples.html
+
+AWS Lambda & Serverless Development - Part 2: Testing & Debugging
+https://www.serverlessops.io/blog/aws-lambda-serverless-development-workflow-part2-testing-debugging
+
+****
+// Event files
+/Users/macgowan/aws/projects/weather-process/s3-trigger/tests/unit/events
+
+aws_s3_event_publisher_schema.json
+aws_s3_event_publisher.json
+
+We have created the above files from the AWS s3 Event resource and the scheme is just a place holder in case we need to implement this - we are learning. 
+
+****
+IDEA
+
+We have just been thinking about how all this CRAP works. We drop a file int he s3 bucket and AWS sends and event (with the file info) to the Lambda nd then we hangel the event. As you will recall we are then getting the json and WUIUWYYWTYWT 
+
+It is here in the code we can capture the trigger Json and maybe use if for the unit test - maybe !!! 
+
+To implement this as a good Unit Test we are going to have to design the controller better so as we are not going to require access to the s3 bucket or the other servers outisde of the Lambda that we are testing. 
+
+Here it is baby :::: 
+
+Event: {'Records': [{'eventVersion': '2.1', 'eventSource': 'aws:s3', 'awsRegion': 'us-east-1', 'eventTime': '2019-09-14T21:03:02.572Z', 'eventName': 'ObjectCreated:Put', 'userIdentity': {'principalId': 'A9CYVEI2FY0NK'}, 'requestParameters': {'sourceIPAddress': '97.116.92.188'}, 'responseElements': {'x-amz-request-id': '2F1C4D7EA780BFE8', 'x-amz-id-2': 'Jif+UNJAv8IR9xBuzXVAS72iWECm+OQbgq7BHx5GRW/bDLTMLOnhKCvo6KKpv4EjnserbYbpHyM='}, 's3': {'s3SchemaVersion': '1.0', 'configurationId': '223bbca3-ad6e-48ce-b288-a82e13c819b1', 'bucket': {'name': 'aws-lambda-trigger-macgowan', 'ownerIdentity': {'principalId': 'A9CYVEI2FY0NK'}, 'arn': 'arn:aws:s3:::aws-lambda-trigger-macgowan'}, 'object': {'key': 'weather_base.json', 'size': 361, 'eTag': '9a751e58eb4b0431de4a9be92f2600d8', 'sequencer': '005D7D558681F88716'}}}]}
+
+
+END OF DOCUMENT 
+HAVE A NICE DAY 
+V-367.900
+
+
+
+
+
+
+
+

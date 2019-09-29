@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: An AWS Serverless Specification template describing your function.
+Resources:
+  Bucket1:
+    Type: AWS::S3::Bucket
+  s3trigger:
+    Properties:
+      CodeUri: s3://aws-sam-bucket-macgowan/d523e61128309efeff94834a741f6f62
+      Description: ''
+      Events:
+        BucketEvent1:
+          Properties:
+            Bucket:
+              Ref: Bucket1
+            Events:
+            - s3:ObjectCreated:*
+          Type: S3
+      Handler: lambda_function.lambda_handler
+      MemorySize: 128
+      Role: arn:aws:iam::244437227229:role/lambda_s3_access
+      Runtime: python3.7
+      Timeout: 3
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31

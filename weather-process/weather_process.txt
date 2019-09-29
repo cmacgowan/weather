@@ -1,7 +1,3 @@
-# weather
-
-
-
 
 Bluerayon Development Labs
 The Weather Process Test 
@@ -181,7 +177,6 @@ sam local start-api
 END OF DOCUMENT 
 HAVE A NICE DAY 
 V-367.900
-
 
 
 
